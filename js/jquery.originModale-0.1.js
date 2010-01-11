@@ -2,13 +2,14 @@ jQuery(function($) {
 	var num = 0;
 	var error = false;
 	var body = $('body');
-	var rightarrow = false;
+	var rightalign = false;
 	var rect = {
 		x: false,
 		y: false,
 		w: false,
 		h: false
 	};
+
 	var frameRect = {
 		x: false,
 		y: false,
@@ -47,7 +48,7 @@ jQuery(function($) {
 		zIndexStart: 500,
 		openSelector: ".originModale",
 		removeSelector: ".originModaleHide",
-		displayHide: false,
+		displayHide: true,
 		debug: false,
 		framePadding: 10,
 		niceOffset: 20,
@@ -80,9 +81,13 @@ jQuery(function($) {
 				e.preventDefault();
 				if(rect.x == false) {
 					rect.x = e.clientX;
-				}
-				if(rect.y == false) {
 					rect.y = e.clientY;
+					if(e.clientX > (body.width()/2)) {
+						rightalign = true;
+					} else {
+						rightalign = false;
+					}
+					
 				}
 				debug(rect);
 				processModal(this);
@@ -94,6 +99,7 @@ jQuery(function($) {
 	
 	function processModal(el) {
 		//debug('processModal');
+		
 		if (modal.loading || modal.transition || modal.anim) {
 			return;
 			debug('return');
@@ -108,6 +114,7 @@ jQuery(function($) {
 				modal.lockPosition = false;
 			} else {
 				modal.lockPosition = true;
+				hideContent();
 			}
 
 			showLoading();
@@ -216,10 +223,9 @@ jQuery(function($) {
 		gui.modal.css({
 			opacity: 0
 		}).show();
-		rect.w = gui.c_holder.outerWidth(true);
-		rect.h = gui.c_holder.height();
-		debug(rect);
-		updateRects();
+		var width = gui.c_holder.outerWidth(true);
+		var height = gui.c_holder.height();
+		updateRects(width, height);
 		gui.modal.css({
 			top: rect.y  + "px",
 			left: rect.x + "px"
@@ -238,13 +244,28 @@ jQuery(function($) {
 		drawFrame();
 	}
 	
-	function updateRects() {
+	function updateRects(width, height) {
 		var xAdjust = config.framePadding + config.triWidth + config.niceOffset;
 		var yAdjust = config.framePadding - config.triOffset - (config.triHeight/2);
+		//var tmprect
 		if(!modal.lockPosition) {
-			rect.x = rect.x + xAdjust;
+			if(rightalign) {
+				rect.x = rect.x - width - xAdjust;
+			} else {
+				rect.x = rect.x + xAdjust;
+				
+			}
 			rect.y = rect.y + yAdjust;
+		} else {
+			if(rightalign) {
+				rect.x = rect.x - (width-rect.w);
+			}
 		}
+		
+		rect.w = width;
+		rect.h = height
+
+		
 		frameRect = {
 			x: rect.x - config.framePadding,
 			y: rect.y - config.framePadding,
@@ -279,7 +300,7 @@ jQuery(function($) {
 			// Start from the top-left point.
 			context.moveTo(frameRect.x, frameRect.y);
 			
-			if(rightarrow == false) {
+			if(rightalign == false) {
 				// left arrow start
 				context.lineTo(frameRect.x, (frameRect.y + offset));
 				context.lineTo(frameRect.x-config.triWidth, frameRect.y + offset + (config.triHeight/2));
@@ -289,7 +310,7 @@ jQuery(function($) {
 			
 			context.lineTo(frameRect.x, frameRect.y+frameRect.h);
 			context.lineTo(frameRect.x+frameRect.w, frameRect.y+frameRect.h);
-			if(rightarrow) {
+			if(rightalign) {
 				context.lineTo(frameRect.x+frameRect.w, frameRect.y + config.triHeight + offset);
 				context.lineTo(frameRect.x+frameRect.w+config.triWidth, frameRect.y + offset + (config.triHeight/2));
 				context.lineTo(frameRect.x+frameRect.w, frameRect.y+offset);
