@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>form</title>
+</head>
+<body>
+<div class="large">
+	<form action="test.php" method="post">
+		<p><input type="text" id="myinput" size="10" /></p>
+
+		<p><input type="submit" value="Continue &rarr;"></p>
+	</form>
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+
+			jQuery("#myinput").val("Write some");
+			$("form").submit(function() {
+				var formData = $(this).serialize();
+				var url = $(this).attr('action');
+				var date = $('#WorkoutDate').val();
+
+				jQuery.ajax({
+				   type: "POST",
+				   url: url,
+				   data: formData,
+				   success: function(data){
+					
+				   }
+				 });
+
+				return false;
+		    });
+
+		});
+	</script>
+</div>
+</body>
+</html>

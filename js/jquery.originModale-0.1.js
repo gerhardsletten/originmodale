@@ -35,7 +35,6 @@ jQuery(function($) {
 	var gui = {
 		canvas: false,
 		bg: false,
-		tmp: false,
 		modal: false,
 		loader: false,
 		c_holder: false,
@@ -158,8 +157,6 @@ jQuery(function($) {
 	
 	function loadedAjax(data) {
 		debug("endAjax" + this.url);
-		//debug(data);
-		gui.tmp.html(data);
 		modal.content = '<div>'+data+'</div>';
 
 		if (modal.content) {
@@ -240,7 +237,7 @@ jQuery(function($) {
 			}).hide().fadeIn();
 		//modal.content = false;
 		$(config.openSelector, gui.c_holder).originModale(config);
-		$(config.closeSelector, gui.c_holder).bind('click', hide);
+		$(config.removeSelector, gui.c_holder).bind('click', hide);
 		drawFrame();
 	}
 	
@@ -329,6 +326,20 @@ jQuery(function($) {
 		}
 			
 	}
+	function canvasClick(e) {
+		var tmp_x = e.clientX;
+		var tmp_y = e.clientY;
+		var hit = false;
+		console.log(frameRect);
+		console.log(tmp_x + "," + tmp_y);
+		if( (tmp_x > frameRect.x && tmp_x < (frameRect.x + frameRect.w)) ) {
+			if( (tmp_y > frameRect.y && tmp_y < (frameRect.y + frameRect.h)) ) {
+				hit = true;
+			}
+			
+		}
+		if(!hit) hide(e);
+	}
 	
 	function initModale() {
 		//alert(body);
@@ -339,10 +350,10 @@ jQuery(function($) {
 			gui.debug = $('#omdebug').css({zIndex: config.zIndexStart + 1}).hide();
 		}
 		
-		contain.append($('<div id="omwrapper"><div id="omholder"></div></div><div id="omtmp"></div><div id="omloading">Loading..</div><canvas id="omcanvas"></canvas><div id="ombg"></div>').hide());
+		contain.append($('<div id="omwrapper"><div id="omholder"></div></div><div id="omloading">Loading..</div><canvas id="omcanvas"></canvas><div id="ombg"></div>').hide());
 		gui.bg = $('#ombg').css({zIndex: config.zIndexStart}).hide();
 		gui.loader = $('#omloading').css({zIndex: config.zIndexStart + 3}).hide();
-		gui.modal = $('#omwrapper').css({zIndex: config.zIndexStart + 4}).hide();
+		gui.modal = $('#omwrapper').css({zIndex: config.zIndexStart + 4, backgroundColor: '#eee'}).hide();
 		gui.canvas = $('#omcanvas').css({zIndex: config.zIndexStart + 2}).hide();
 		gui.c_holder = $('#omholder', gui.modal);
 		if(config.displayHide) {
@@ -351,8 +362,8 @@ jQuery(function($) {
 			gui.close_btn.bind('click', hide);
 			
 		}
-		gui.tmp = $('#omtmp').hide();
-		gui.bg.bind('click', hide);
+		gui.canvas.bind('click', canvasClick);
+		gui.modal.bind('click', function() {return false;})
 		modal.init = true;
 	}
 	
